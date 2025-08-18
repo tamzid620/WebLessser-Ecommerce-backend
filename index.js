@@ -5,11 +5,19 @@ const app = express();
 const port = 5000;
 // ------------------------------------------------
 
+// app.use(cors({
+//   origin: ["http://localhost:5173"],
+//   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+//   credentials: true
+// }));
 app.use(cors({
-  origin: ["http://localhost:5173"],
+  origin: (origin, callback) => {
+    callback(null, origin || true); // Allow all origins dynamically
+  },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true
 }));
+
 app.use(express.json());
 // ------------------------------------------------
 

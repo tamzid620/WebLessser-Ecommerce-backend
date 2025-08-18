@@ -40,16 +40,11 @@ module.exports = function businessAdminUserRoutes(businessAdminUsersCollection) 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Subdomain handling (default = example.com)
+        // Subdomain handling 
         const newSubDomain = subDomain && subDomain.trim() !== ""
             ? subDomain
-            : "example.com";
-        // Check if subdomain already exists
-        // const existingDomain = await businessAdminUsersCollection.findOne({ subDomain: newSubDomain });
-        // if (existingDomain) {
-        //     return res.status(400).json({ message: "This subdomain is already taken" });
-        // }
-
+            : "example";
+        
         // User object
         const newUser = {
             firstName,
@@ -59,7 +54,7 @@ module.exports = function businessAdminUserRoutes(businessAdminUsersCollection) 
             email,
             password: hashedPassword,
             role: "businessAdmin",
-            subDomain: newSubDomain,
+            subDomain: `http://${newSubDomain}${".localhost:5173"}`,
             createdAt: new Date(),
         };
 
@@ -105,6 +100,7 @@ module.exports = function businessAdminUserRoutes(businessAdminUsersCollection) 
                 email: user.email,
                 phoneNo: user.phoneNo,
                 role: user.role,
+                subDomain: user.subDomain,
             },
         });
 
