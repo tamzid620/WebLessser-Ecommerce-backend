@@ -58,28 +58,21 @@ module.exports = function businessAdminUserRoutes(businessAdminUsersCollection) 
         return res.status(400).json({ message: "Email and password are required" });
       }
 
-      // Check if user exists
+      
       const user = await businessAdminUsersCollection.findOne({ email });
       if (!user) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
 
-      // Compare password
+      
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
 
-      // Optional: generate JWT token
-      // const token = jwt.sign(
-      //   { userId: user._id, role: user.role },
-      //   process.env.JWT_SECRET,
-      //   { expiresIn: "1h" }
-      // );
-
       res.status(200).json({
         message: "Login successful",
-        // token, // uncomment if using JWT
+        
         user: {
           id: user._id,
           firstName: user.firstName,
