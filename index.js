@@ -40,18 +40,14 @@ const client = new MongoClient(uri, {
 // ################################################################################
 
 // routes import secton ----------------
-const allMealsRoutes = require('./routes/allMeals/allMeals');
-const usersRoutes = require('./routes/users/users');
 const superAdminUserRoutes = require('./routes/users/superAdminUsers');
+const businessAdminUserRoutes = require('./routes/users/businessAdminUsers');
 
 client.connect()
   .then(() => {
     const db = client.db(dbName);
-    allMealCollection = db.collection('meals');
-    usersCollection = db.collection('users');
     superAdminUsersCollection = db.collection('superAdminUsers');
-
-
+    businessAdminUsersCollection = db.collection('businessAdminUsers');
 
     // Define Routes secton ---------------------------
 
@@ -59,9 +55,8 @@ client.connect()
       res.send('WebLessser Backend is running!');
     });
 
-    app.use('/all-meals', allMealsRoutes);
-    app.use('/users', usersRoutes(usersCollection));
     app.use('/super-admin-users', superAdminUserRoutes(superAdminUsersCollection));
+    app.use('/business-admin-users', businessAdminUserRoutes(businessAdminUsersCollection));
 
 
     // ################################################################################
