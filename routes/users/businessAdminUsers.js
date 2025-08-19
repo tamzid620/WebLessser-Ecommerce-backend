@@ -49,7 +49,7 @@ module.exports = function businessAdminUserRoutes(businessAdminUsersCollection) 
             product: [],
             createdAt: new Date(),
         };
-
+        
         // Insert into DB
         const result = await businessAdminUsersCollection.insertOne(newUser);
 

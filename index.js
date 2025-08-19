@@ -12,7 +12,7 @@ const port = 5000;
 // }));
 app.use(cors({
   origin: (origin, callback) => {
-    callback(null, origin || true); // Allow all origins dynamically
+    callback(null, origin || true); 
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true
