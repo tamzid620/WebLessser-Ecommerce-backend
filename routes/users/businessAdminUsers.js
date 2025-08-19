@@ -1,6 +1,8 @@
 // routes/users/businessAdminUsers.js
 const express = require("express");
 const bcrypt = require("bcrypt");
+const { ObjectId } = require("mongodb");
+
 
 module.exports = function businessAdminUserRoutes(businessAdminUsersCollection) {
     const router = express.Router();
@@ -11,23 +13,12 @@ module.exports = function businessAdminUserRoutes(businessAdminUsersCollection) 
         res.send({ message: 'Super Admin Users API is running!' });
     });
 
-    // all Business Admin ========================= 
-    router.get('/all-business-admin', async (req, res) => {
-        try {
-            const users = await businessAdminUsersCollection.find({}).toArray();
-            res.status(200).send(users);
-        } catch (error) {
-            console.error('Error fetching business admin users:', error);
-            res.status(500).send({ message: 'Server error' });
-        }
-    });
-
     // Register Business Admin ========================= 
     router.post("/register", async (req, res) => {
-        const { firstName, lastName, userName, phoneNo, email, password,  subDomain } = req.body;
+        const { firstName, lastName, userName, phoneNo, email, password, subDomain } = req.body;
 
         // Basic validation
-        if (!firstName || !lastName || !userName || !phoneNo || !email || !password ) {
+        if (!firstName || !lastName || !userName || !phoneNo || !email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
@@ -44,7 +35,7 @@ module.exports = function businessAdminUserRoutes(businessAdminUsersCollection) 
         const newSubDomain = subDomain && subDomain.trim() !== ""
             ? subDomain
             : "example";
-        
+
         // User object
         const newUser = {
             firstName,
@@ -55,6 +46,7 @@ module.exports = function businessAdminUserRoutes(businessAdminUsersCollection) 
             password: hashedPassword,
             role: "businessAdmin",
             subDomain: `http://${newSubDomain}${".localhost:5173"}`,
+            product: [],
             createdAt: new Date(),
         };
 
@@ -106,5 +98,56 @@ module.exports = function businessAdminUserRoutes(businessAdminUsersCollection) 
 
     });
 
+    // all Business Admin ========================= 
+    router.get('/all-business-admin', async (req, res) => {
+        try {
+            const users = await businessAdminUsersCollection.find({}).toArray();
+            res.status(200).send(users);
+        } catch (error) {
+            console.error('Error fetching business admin users:', error);
+            res.status(500).send({ message: 'Server error' });
+        }
+    });
+
+    // Add product Business Admin =========================
+    router.post("/add-product/:id", async (req, res) => {
+        const { id } = req.params;
+        const { title, description, price, warranty } = req.body;
+
+        if (!title || !description || !price || !warranty) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        try {
+            const newProduct = {
+                id: new ObjectId(), 
+                title,
+                description,
+                price: parseFloat(price),
+                warranty,
+            };
+
+            const result = await businessAdminUsersCollection.updateOne(
+                // { _id: new require("mongodb").ObjectId(id) },
+                { _id: new ObjectId(id) },
+                { $push: { product: newProduct } }
+            );
+
+            if (result.modifiedCount === 0) {
+                return res.status(404).json({ message: "User not found or product not added" });
+            }
+
+            res.status(200).json({ message: "Product added successfully", product: newProduct });
+        } catch (error) {
+            console.error("Error adding product:", error);
+            res.status(500).json({ message: "Server error" });
+        }
+    });
+
+
+
     return router;
 }
+
+
+
